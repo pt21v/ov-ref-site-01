@@ -1,0 +1,70 @@
+# PRODUCTION config — Decap CMS
+# ⚠️ Dev-only `local_backend` must NOT be here. For local testing, add:
+#   local_backend: true   (and run `npx decap-server`)
+#
+# Before deploy, choose ONE auth backend below (Option A or Option B).
+
+# --- Option A: GitHub OAuth (most secure) -------------------------------
+# Requires a server-side OAuth proxy (decap-cms-github-oauth-provider or
+# Netlify Identity). Client gets short-lived tokens.
+backend:
+  name: github
+  repo: your-org/client-site      # ← CHANGE: GitHub org/repo
+  branch: main
+  base_url: https://your-oauth-proxy.example.com   # ← CHANGE: OAuth proxy URL
+
+# --- Option B: Git Gateway + fine-grained PAT ---------------------------
+# Fine-grained PAT (1 repo, Contents RW, expire ≤90 days) passed via env /
+# secret manager. NEVER hardcode in this file — it ships to the browser.
+# backend:
+#   name: git-gateway
+#   branch: main
+
+# --- Shared config -------------------------------------------------------
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: siteConfig
+    label: Site Settings
+    files:
+      - name: site
+        label: Site Config
+        file: src/content/siteConfig/site.json
+        fields:
+          - { name: firmName, label: Firm Name, widget: string }
+          - { name: tagline, label: Tagline, widget: string, required: false }
+          - { name: brandColor, label: Brand Color, widget: color, default: "#1150AB" }
+          - { name: email, label: Email, widget: string, required: false }
+          - { name: whatsapp, label: WhatsApp, widget: string, required: false }
+          - { name: instagram, label: Instagram (without @), widget: string, required: false }
+          - { name: phone, label: Phone, widget: string, required: false }
+          - { name: address, label: Address, widget: string, required: false }
+          - { name: seoTitle, label: SEO Title, widget: string, required: false }
+          - { name: seoDescription, label: SEO Description, widget: text, required: false }
+
+  - name: pages
+    label: Pages
+    folder: src/content/pages
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: navTitle, label: Nav Title (optional), widget: string, required: false }
+      - { name: order, label: Nav Order, widget: number, default: 99, value_type: int }
+      - { name: body, label: Content, widget: markdown }
+
+  - name: projects
+    label: Projects (Portfolio)
+    folder: src/content/projects
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: title, label: Project Title, widget: string }
+      - { name: year, label: Year, widget: number, required: false, value_type: int }
+      - { name: location, label: Location, widget: string, required: false }
+      - { name: category, label: Category, widget: select, options: [Residential, Commercial, Interior, Hospitality, Other], required: false }
+      - { name: featured, label: Featured on Homepage, widget: boolean, default: false }
+      - { name: coverImage, label: Cover Image, widget: image, required: false }
+      - { name: images, label: Gallery Images, widget: list, field: { name: image, label: Image, widget: image }, required: false }
+      - { name: body, label: Description, widget: markdown }

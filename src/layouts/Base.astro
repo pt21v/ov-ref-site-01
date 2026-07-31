@@ -1,0 +1,106 @@
+---
+// Base layout — OV design tokens, customize per client via siteConfig
+export interface Props {
+  title: string;
+  description?: string;
+  config: {
+    firmName: string;
+    brandColor?: string;
+    email?: string;
+    whatsapp?: string;
+    instagram?: string;
+    phone?: string;
+    address?: string;
+  };
+  navItems?: { label: string; href: string }[];
+}
+const { title, description, config, navItems = [] } = Astro.props;
+const brand = config.brandColor || '#1150AB';
+const year = new Date().getFullYear();
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description ?? config.firmName} />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <style>
+    :root {
+      --brand: {brand};
+      --text: #1a1a1a;
+      --text-muted: rgba(0,0,0,0.55);
+      --bg: #ffffff;
+      --border: rgba(0,0,0,0.08);
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; height: auto; display: block; }
+
+    /* Header */
+    .header { border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .header-inner { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+    .brand-name { font-size: 1.15rem; font-weight: 600; color: var(--brand); }
+    .nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .nav a { font-size: 0.9rem; color: var(--text); padding: 0.25rem 0; }
+    .nav a:hover { color: var(--brand); }
+    .cta { font-size: 0.85rem; font-weight: 600; color: #fff; background: var(--brand); padding: 0.55rem 1.3rem; }
+    .cta:hover { opacity: 0.9; }
+
+    /* Layout */
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    main { min-height: 60vh; }
+
+    /* Footer */
+    .footer { border-top: 1px solid var(--border); margin-top: 4rem; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; padding: 2rem; display: flex; justify-content: space-between; gap: 2rem; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-muted); }
+    .footer a:hover { color: var(--brand); }
+
+    @media (max-width: 768px) {
+      .header-inner { flex-wrap: wrap; }
+      .nav { order: 3; width: 100%; justify-content: center; }
+    }
+  </style>
+  <slot name="head" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="brand-name">{config.firmName}</a>
+      <nav class="nav">
+        {navItems.map(item => <a href={item.href}>{item.label}</a>)}
+      </nav>
+      <a href={config.email ? `mailto:${config.email}` : '#contact'} class="cta">Start a Project</a>
+    </div>
+  </header>
+
+  <main>
+    <slot />
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <strong>{config.firmName}</strong>
+        {config.address && <div>{config.address}</div>}
+        <div>© {year} {config.firmName}</div>
+      </div>
+      <div>
+        {config.email && <div>Email: <a href={`mailto:${config.email}`}>{config.email}</a></div>}
+        {config.phone && <div>Phone: {config.phone}</div>}
+        {config.whatsapp && <div>WhatsApp: {config.whatsapp}</div>}
+        {config.instagram && <div>Instagram: <a href={`https://instagram.com/${config.instagram.replace('@','')}`}>@{config.instagram.replace('@','')}</a></div>}
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

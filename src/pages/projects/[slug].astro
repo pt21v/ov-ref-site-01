@@ -1,0 +1,58 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map(project => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const config = (await getCollection('siteConfig'))[0].data;
+const pages = (await getCollection('pages')).sort((a, b) => a.data.order - b.data.order);
+
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Projects', href: '/projects/' },
+  ...pages.filter(p => p.data.title !== 'Home').map(p => ({
+    label: p.data.navTitle ?? p.data.title,
+    href: `/${p.slug}/`,
+  })),
+];
+
+const { Content } = await project.render();
+---
+<Base title={`${project.data.title} — ${config.firmName}`} description={project.data.category} config={config} navItems={navItems}>
+  <slot name="head" slot="head">
+    <style>
+      .detail { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+      .back { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem; display: inline-block; }
+      .back:hover { color: var(--brand); }
+      .detail h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 600; letter-spacing: -0.03em; }
+      .meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin: 1rem 0 2rem; font-size: 0.9rem; color: var(--text-muted); }
+      .cover { width: 100%; aspect-ratio: 16/9; object-fit: cover; background: #f0f0f0; margin-bottom: 1rem; }
+      .body { max-width: 720px; font-size: 1.05rem; line-height: 1.7; }
+      .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; margin-top: 2rem; }
+      .gallery img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+    </style>
+  </slot>
+  <article class="detail">
+    <a href="/projects/" class="back">← All projects</a>
+    <h1>{project.data.title}</h1>
+    <div class="meta">
+      {project.data.year && <span>{project.data.year}</span>}
+      {project.data.category && <span>{project.data.category}</span>}
+      {project.data.location && <span>{project.data.location}</span>}
+    </div>
+    {project.data.coverImage && <img class="cover" src={project.data.coverImage} alt={project.data.title} />}
+    <div class="body"><Content /></div>
+    {project.data.images && project.data.images.length > 0 && (
+      <div class="gallery">
+        {project.data.images.map(src => <img src={src} alt="" loading="lazy" />)}
+      </div>
+    )}
+  </article>
+</Base>

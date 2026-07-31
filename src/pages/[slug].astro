@@ -1,0 +1,43 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  const config = (await getCollection('siteConfig'))[0].data;
+  return pages.filter(p => p.data.title !== 'Home').map(page => ({
+    params: { slug: page.slug },
+    props: { page, config },
+  }));
+}
+
+const { page, config } = Astro.props;
+const pages = (await getCollection('pages')).sort((a, b) => a.data.order - b.data.order);
+
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Projects', href: '/projects/' },
+  ...pages.filter(p => p.data.title !== 'Home').map(p => ({
+    label: p.data.navTitle ?? p.data.title,
+    href: `/${p.slug}/`,
+  })),
+];
+
+const { Content } = await page.render();
+---
+<Base title={`${page.data.title} — ${config.firmName}`} description={config.seoDescription} config={config} navItems={navItems}>
+  <slot name="head" slot="head">
+    <style>
+      .page { max-width: 720px; margin: 0 auto; padding: 4rem 2rem; }
+      .page h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 600; letter-spacing: -0.03em; margin-bottom: 2rem; }
+      .page h2 { font-size: 1.3rem; margin: 2rem 0 0.75rem; }
+      .page p { margin-bottom: 1rem; }
+      .page ul, .page ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+      .page a { color: var(--brand); text-decoration: underline; }
+    </style>
+  </slot>
+  <article class="page">
+    <h1>{page.data.title}</h1>
+    <Content />
+  </article>
+</Base>

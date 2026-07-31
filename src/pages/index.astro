@@ -1,0 +1,79 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const config = (await getCollection('siteConfig'))[0].data;
+const pages = (await getCollection('pages')).sort((a, b) => a.data.order - b.data.order);
+const projects = (await getCollection('projects')).sort((a, b) => (b.data.year ?? 0) - (a.data.year ?? 0));
+const featured = projects.filter(p => p.data.featured);
+const home = (await getCollection('pages')).find(p => p.data.title === 'Home');
+
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Projects', href: '/projects/' },
+  ...pages.filter(p => p.data.title !== 'Home').map(p => ({
+    label: p.data.navTitle ?? p.data.title,
+    href: `/${p.slug}/`,
+  })),
+];
+
+const { Content } = await home.render();
+---
+<Base
+  title={config.seoTitle ?? config.firmName}
+  description={config.seoDescription ?? config.tagline}
+  config={config}
+  navItems={navItems}
+>
+  <slot name="head" slot="head">
+    <style>
+      .hero { padding: 5rem 2rem 3rem; text-align: center; }
+      .hero h1 { font-size: clamp(2.2rem, 5.5vw, 4rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
+      .hero .tagline { margin-top: 1rem; font-size: 1.1rem; color: var(--text-muted); }
+      .hero-cta { display: inline-block; margin-top: 2rem; font-size: 0.9rem; font-weight: 600; color: #fff; background: var(--brand); padding: 0.7rem 1.8rem; }
+      .body { max-width: 720px; margin: 0 auto; padding: 2rem 2rem 0; font-size: 1.05rem; }
+      .body h2 { margin: 2rem 0 0.75rem; font-size: 1.4rem; }
+      .featured { padding: 4rem 2rem; }
+      .featured-title { max-width: 1200px; margin: 0 auto 1.5rem; font-size: 1.3rem; font-weight: 600; }
+      .grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+      .card { display: block; border: 1px solid var(--border); }
+      .card img { aspect-ratio: 4/3; object-fit: cover; background: #f0f0f0; }
+      .card-meta { padding: 1rem; }
+      .card-meta h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+      .card-meta span { font-size: 0.8rem; color: var(--text-muted); }
+      @media (max-width: 768px) { .hero { padding: 3rem 1.5rem 2rem; } }
+    </style>
+  </slot>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>{config.tagline ?? config.firmName}</h1>
+    <p class="tagline">{config.firmName} — Architecture Studio</p>
+    <a href="/projects/" class="hero-cta">View Our Work</a>
+  </section>
+
+  <!-- Home body content -->
+  {home && (
+    <div class="body"><Content /></div>
+  )}
+
+  <!-- Featured projects -->
+  {featured.length > 0 && (
+    <section class="featured">
+      <h2 class="featured-title">Featured Projects</h2>
+      <div class="grid">
+        {featured.map(project => (
+          <a class="card" href={`/projects/${project.slug}/`}>
+            {project.data.coverImage
+              ? <img src={project.data.coverImage} alt={project.data.title} loading="lazy" />
+              : <img src="" alt={project.data.title} style="width:100%" />}
+            <div class="card-meta">
+              <h3>{project.data.title}</h3>
+              <span>{project.data.year} · {project.data.category}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+</Base>

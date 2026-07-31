@@ -1,0 +1,49 @@
+{
+  "$ref": "#/definitions/siteConfig",
+  "definitions": {
+    "siteConfig": {
+      "type": "object",
+      "properties": {
+        "firmName": {
+          "type": "string"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "brandColor": {
+          "type": "string",
+          "default": "#1150AB"
+        },
+        "email": {
+          "type": "string"
+        },
+        "whatsapp": {
+          "type": "string"
+        },
+        "instagram": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "seoTitle": {
+          "type": "string"
+        },
+        "seoDescription": {
+          "type": "string"
+        },
+        "$schema": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "firmName"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
