@@ -1,7 +1,6 @@
 ---
 id: "tower-a"
-"Project Title": "Tower A audit test"
-"Year Built": 2025
+"Project Title": "Tower A v3"
 ---
 
 
