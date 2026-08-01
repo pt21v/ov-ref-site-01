@@ -1,7 +1,7 @@
 ---
 id: "tower-a"
 title: "Tower A"
-year: 2025
+completedOn: "2026-08-01"
 ---
 
 
