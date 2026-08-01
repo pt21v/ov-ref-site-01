@@ -1,6 +1,6 @@
 ---
 id: "tower-a"
-"Project Title": "Tower A v2"
+"Project Title": "Tower A final"
 "Year Built": 2025
 ---
 
